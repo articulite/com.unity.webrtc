@@ -3,6 +3,14 @@
 # Source common variables and functions
 source $(dirname $0)/00_common.sh
 
+# Use depot_tools Python binary
+export PYTHON3_BIN="$(cd "$(dirname "$0")"; cd ..; pwd)/depot_tools/python-bin/python3"
+echo "Using Python binary: $PYTHON3_BIN"
+
+# Modify PATH to ensure the right Python is first
+OLD_PATH="$PATH"
+export PATH="$(dirname $PYTHON3_BIN):$PATH"
+
 build_lib() {
   local target_cpu=$1
   local is_debug=$2
@@ -12,7 +20,8 @@ build_lib() {
   mkdir -p "$ARTIFACTS_DIR/lib/${target_cpu}"
   
   echo "Generating ninja files..."
-  gn gen "$OUTPUT_DIR" --root="src" \
+  # Use Python wrapper for gn
+  $PYTHON3_BIN "$(cd "$(dirname "$0")"; cd ..; pwd)/depot_tools/gn.py" gen "$OUTPUT_DIR" --root="src" \
     --args="is_debug=${is_debug} \
     is_java_debug=${is_debug} \
     target_os=\"android\" \
@@ -29,7 +38,8 @@ build_lib() {
   check_result "GN generation for ${target_cpu} (debug=${is_debug})"
   
   echo "Building static library..."
-  ninja -C "$OUTPUT_DIR" webrtc
+  # Use Python wrapper for ninja
+  $PYTHON3_BIN "$(cd "$(dirname "$0")"; cd ..; pwd)/depot_tools/ninja.py" -C "$OUTPUT_DIR" webrtc
   check_result "Ninja build for ${target_cpu} (debug=${is_debug})"
   
   filename="libwebrtc.a"
@@ -54,4 +64,7 @@ build_lib "arm64" "false"  # Release
 build_lib "x64" "true"     # Debug
 build_lib "x64" "false"    # Release
 
-echo "All WebRTC static libraries built successfully" 
+# Restore original PATH
+export PATH="$OLD_PATH"
+
+echo "All WebRTC static libraries built successfully"
