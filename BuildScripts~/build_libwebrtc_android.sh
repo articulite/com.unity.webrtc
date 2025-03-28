@@ -9,6 +9,8 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting WebRTC Android build process at $(date '+%Y-%m-%d %H:%M:%S')"
 
+
+
 if [ ! -e "$(pwd)/depot_tools" ]
 then
   echo "Cloning depot_tools..."
@@ -21,6 +23,9 @@ export WEBRTC_VERSION=5845
 export OUTPUT_DIR="$(pwd)/out"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
+
+# bootstrap vpython3
+./depot_tools/vpython3 --version
 
 if [ ! -e "$(pwd)/src" ]
 then
