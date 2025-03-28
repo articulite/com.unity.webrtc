@@ -1,12 +1,17 @@
 #!/bin/bash -eu
 
-export LIBWEBRTC_DOWNLOAD_URL=https://github.com/Unity-Technologies/com.unity.webrtc/releases/download/M116/webrtc-android.zip
 export SOLUTION_DIR=$(pwd)/Plugin~
 export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
+export ARTIFACTS_DIR=$(pwd)/artifacts
 
-# Download LibWebRTC 
-curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
-unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
+# Use local WebRTC build
+if [ ! -f "$ARTIFACTS_DIR/webrtc-android.zip" ]; then
+    echo "Error: webrtc-android.zip not found in artifacts directory. Please run build_libwebrtc_android.sh first."
+    exit 1
+fi
+
+# Extract local WebRTC build
+unzip -d $SOLUTION_DIR/webrtc $ARTIFACTS_DIR/webrtc-android.zip
 cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 
 # Update plugin namespaces
