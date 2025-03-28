@@ -345,6 +345,7 @@ MigrationBackup/
 
 # CMake
 cmake-build-*/
+cmake-3.24.3*
 
 # Plugin build folder
 Plugin~/build
