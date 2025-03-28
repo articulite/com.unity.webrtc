@@ -9,8 +9,18 @@ curl -L $LIBWEBRTC_DOWNLOAD_URL > webrtc.zip
 unzip -d $SOLUTION_DIR/webrtc webrtc.zip 
 cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 
-# Build UnityRenderStreaming Plugin 
+# Update plugin namespaces
+echo "Updating plugin namespaces..."
 cd "$SOLUTION_DIR"
+
+# Update C++ JNI function names
+find . -type f -name "*.txt" -exec sed -i 's/Java_org_webrtc/Java_org_unityrtc/g' {} +
+
+# Update C++ files in WebRTCPlugin
+find ./WebRTCPlugin -type f -name "*.cc" -exec sed -i 's/org\/webrtc/org\/unityrtc/g' {} +
+find ./WebRTCPlugin -type f -name "*.h" -exec sed -i 's/org\/webrtc/org\/unityrtc/g' {} +
+
+# Build UnityRenderStreaming Plugin 
 for ARCH_ABI in "arm64-v8a" "x86_64"
 do
   cmake . \

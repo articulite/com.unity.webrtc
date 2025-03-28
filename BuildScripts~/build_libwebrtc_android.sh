@@ -25,6 +25,11 @@ then
   gclient sync -D --force --reset
 fi
 
+# Execute namespace renaming
+echo "Executing namespace renaming..."
+chmod +x rename_namespace.sh
+./rename_namespace.sh
+
 # Add jsoncpp
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
