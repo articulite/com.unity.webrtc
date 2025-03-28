@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Setup logging - redirect all output to both console and file
+LOG_FILE="build_plugin_android.log"
+# Clear previous log file
+> "$LOG_FILE"
+# Redirect stdout and stderr to both console and file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "Starting Android plugin build process at $(date '+%Y-%m-%d %H:%M:%S')"
+
 export SOLUTION_DIR=$(pwd)/Plugin~
 export PLUGIN_DIR=$(pwd)/Runtime/Plugins/Android
 export ARTIFACTS_DIR=$(pwd)/artifacts
@@ -10,7 +19,7 @@ if [ ! -f "$ARTIFACTS_DIR/webrtc-android.zip" ]; then
     exit 1
 fi
 
-# Extract local WebRTC build
+echo "Extracting local WebRTC build..."
 unzip -d $SOLUTION_DIR/webrtc $ARTIFACTS_DIR/webrtc-android.zip
 cp -f $SOLUTION_DIR/webrtc/lib/libwebrtc.aar $PLUGIN_DIR
 

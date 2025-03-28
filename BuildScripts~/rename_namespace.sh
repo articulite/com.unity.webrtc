@@ -1,8 +1,13 @@
 #!/bin/bash -eu
 
-# Script to rename WebRTC namespaces from org.webrtc to xyz.webrtc
+# Setup logging - redirect all output to both console and file
+LOG_FILE="rename_namespace.log"
+# Clear previous log file
+> "$LOG_FILE"
+# Redirect stdout and stderr to both console and file
+exec > >(tee -a "$LOG_FILE") 2>&1
 
-echo "Starting namespace renaming process..."
+echo "Starting namespace renaming process at $(date '+%Y-%m-%d %H:%M:%S')"
 
 SRC_DIR=$(pwd)/src
 SDK_DIR=$SRC_DIR/sdk/android
@@ -38,11 +43,13 @@ rename_namespace() {
 
 # Stash any changes and clean working directory
 cd "$SRC_DIR"
+echo "Stashing changes and cleaning working directory..."
 git stash
 git clean -fd
 cd ..
 
 # Apply jsoncpp patch first
+echo "Applying jsoncpp patch..."
 patch -N "src/BUILD.gn" < "patches/add_jsoncpp.patch"
 
 # Process Android SDK directory
@@ -62,4 +69,4 @@ rename_namespace "$MODULES_DIR/audio_device/android/java/src" false
 echo "Processing C++ files..."
 rename_namespace "$SRC_DIR" true
 
-echo "Namespace renaming complete!" 
+echo "Namespace renaming complete at $(date '+%Y-%m-%d %H:%M:%S')!" 

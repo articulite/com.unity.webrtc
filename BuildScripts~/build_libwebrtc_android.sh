@@ -1,7 +1,17 @@
 #!/bin/bash -eu
 
+# Setup logging - redirect all output to both console and file
+LOG_FILE="build_libwebrtc_android.log"
+# Clear previous log file
+> "$LOG_FILE"
+# Redirect stdout and stderr to both console and file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "Starting WebRTC Android build process at $(date '+%Y-%m-%d %H:%M:%S')"
+
 if [ ! -e "$(pwd)/depot_tools" ]
 then
+  echo "Cloning depot_tools..."
   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 
@@ -14,49 +24,53 @@ export PYTHON3_BIN="$(pwd)/depot_tools/python-bin/python3"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  # Exclude example for reduction
+  echo "Excluding examples from fetch config..."
   patch -N "depot_tools/fetch_configs/webrtc.py" < "$COMMAND_DIR/patches/fetch_exclude_examples.patch"
+  echo "Fetching webrtc_android..."
   fetch --nohooks webrtc_android
   cd src
+  echo "Configuring git settings..."
   sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
   sudo git config --system core.longpaths true
+  echo "Checking out WebRTC version ${WEBRTC_VERSION}..."
   git checkout "refs/remotes/branch-heads/$WEBRTC_VERSION"
   cd ..
+  echo "Running gclient sync..."
   gclient sync -D --force --reset
 fi
 
-# Execute namespace renaming
 echo "Executing namespace renaming..."
 chmod +x rename_namespace.sh
 ./rename_namespace.sh
 
-# Add jsoncpp
+echo "Adding jsoncpp..."
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"
 
-# Add visibility libunwind
+echo "Adding visibility libunwind..."
 patch -N "src/buildtools/third_party/libunwind/BUILD.gn" < "$COMMAND_DIR/patches/add_visibility_libunwind.patch"
 
-# Add deps libunwind
+echo "Adding deps libunwind..."
 patch -N "src/build/config/BUILD.gn" < "$COMMAND_DIR/patches/add_deps_libunwind.patch"
 
-# Add -mno-outline-atomics flag
+echo "Adding -mno-outline-atomics flag..."
 patch -N "src/build/config/compiler/BUILD.gn" < "$COMMAND_DIR/patches/add_nooutlineatomics_flag.patch"
 
-# downgrade to JDK8 because Unity supports OpenJDK version 1.8.
-# https://docs.unity3d.com/Manual/android-sdksetup.html
+echo "Downgrading to JDK8 - patching compile_java.py..."
 patch -N "src/build/android/gyp/compile_java.py" < "$COMMAND_DIR/patches/downgradeJDKto8_compile_java.patch"
+echo "Downgrading to JDK8 - patching turbine.py..."
 patch -N "src/build/android/gyp/turbine.py" < "$COMMAND_DIR/patches/downgradeJDKto8_turbine.patch"
 
-# Fix SetRawImagePlanes() in LibvpxVp8Encoder
+echo "Fixing SetRawImagePlanes in LibvpxVp8Encoder..."
 patch -N "src/modules/video_coding/codecs/vp8/libvpx_vp8_encoder.cc" < "$COMMAND_DIR/patches/libvpx_vp8_encoder.patch"
 
 pushd src
-# Fix AdaptedVideoTrackSource::video_adapter()
+echo "Fixing AdaptedVideoTrackSource::video_adapter..."
 patch -p1 < "$COMMAND_DIR/patches/fix_adaptedvideotracksource.patch"
-# Fix Android video encoder 
+echo "Fixing Android video encoder..."
 patch -p1 < "$COMMAND_DIR/patches/fix_android_videoencoder.patch"
 popd
 
+echo "Creating artifacts directory..."
 mkdir -p "$ARTIFACTS_DIR/lib"
 
 
