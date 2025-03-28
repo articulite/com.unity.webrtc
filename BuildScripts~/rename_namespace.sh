@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-# Script to rename WebRTC namespaces from org.webrtc to org.unityrtc
+# Script to rename WebRTC namespaces from org.webrtc to xyz.webrtc
 
 echo "Starting namespace renaming process..."
 
@@ -18,21 +18,21 @@ rename_namespace() {
     
     # Rename Java package directories
     if [ -d "$dir/org/webrtc" ]; then
-        mv "$dir/org/webrtc" "$dir/org/unityrtc"
+        mv "$dir/org/webrtc" "$dir/xyz/webrtc"
     fi
     
     # Update BUILD.gn files
-    find "$dir" -name "BUILD.gn" -type f -exec sed -i 's/org\/webrtc/org\/unityrtc/g' {} +
+    find "$dir" -name "BUILD.gn" -type f -exec sed -i 's/org\/webrtc/xyz\/webrtc/g' {} +
     
     # Update Java files
-    find "$dir" -name "*.java" -type f -exec sed -i 's/org\.webrtc/org\.unityrtc/g' {} +
+    find "$dir" -name "*.java" -type f -exec sed -i 's/org\.webrtc/xyz\.webrtc/g' {} +
     
     # Update C++ files
     if [ "$pattern" = "true" ]; then
-        find "$dir" -name "*.cc" -type f -exec sed -i 's/org\.webrtc/org\.unityrtc/g' {} +
-        find "$dir" -name "*.h" -type f -exec sed -i 's/org\.webrtc/org\.unityrtc/g' {} +
-        find "$dir" -name "*.cc" -type f -exec sed -i 's/org_webrtc/org_unityrtc/g' {} +
-        find "$dir" -name "*.h" -type f -exec sed -i 's/org_webrtc/org_unityrtc/g' {} +
+        find "$dir" -name "*.cc" -type f -exec sed -i 's/org\.webrtc/xyz\.webrtc/g' {} +
+        find "$dir" -name "*.h" -type f -exec sed -i 's/org\.webrtc/xyz\.webrtc/g' {} +
+        find "$dir" -name "*.cc" -type f -exec sed -i 's/org_webrtc/xyz_webrtc/g' {} +
+        find "$dir" -name "*.h" -type f -exec sed -i 's/org_webrtc/xyz_webrtc/g' {} +
     fi
 }
 
