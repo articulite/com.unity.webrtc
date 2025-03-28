@@ -10,6 +10,17 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting environment setup at $(date '+%Y-%m-%d %H:%M:%S')"
 
+# Install pkg-config, zip
+sudo apt install -y pkg-config zip
+
+# Download Android NDK r21b
+wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
+
+# Unzip the downloaded NDK file to home directory
+unzip android-ndk-r21b-linux-x86_64.zip -d ~/
+
+# Set Android NDK root path to `ANDROID_NDK` environment variable
+echo "export ANDROID_NDK=~/android-ndk-r21b/" >> ~/.profile
 
 
 # Install clang 11
@@ -41,8 +52,8 @@ sudo -H python3.8 -m pip install git+https://github.com/dav1dde/glad.git@glad2#e
 echo "Installing CUDA SDK..."
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-ubuntu1604.pin
 sudo mv cuda-ubuntu1604.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+sudo apt-key add 7fa2af80.pub
 sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/ /"
 
 echo "Updating package lists..."
