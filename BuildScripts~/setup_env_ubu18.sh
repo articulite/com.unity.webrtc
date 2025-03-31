@@ -12,7 +12,13 @@ echo "Starting environment setup at $(date '+%Y-%m-%d %H:%M:%S')"
 
 Install pkg-config, zip
 sudo apt install -y pkg-config zip
-sudo apt install -y openjdk-8-jdk git patch
+sudo apt install -y openjdk-8-jdk patch
+
+# Add Git PPA and install latest Git
+echo "Adding Git PPA and installing latest Git..."
+sudo add-apt-repository ppa:git-core/ppa -y
+sudo apt update
+sudo apt install -y git
 
 # Download Android NDK r21b
 wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
