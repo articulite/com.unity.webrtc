@@ -21,9 +21,13 @@ rename_namespace() {
     
     echo "Processing directory: $dir"
     
-    # Rename Java package directories
+    # Rename Java package directories if source exists
     if [ -d "$dir/org/webrtc" ]; then
+        echo "Renaming $dir/org/webrtc to $dir/xyz/webrtc"
+        mkdir -p "$dir/xyz" # Ensure target parent directory exists
         mv "$dir/org/webrtc" "$dir/xyz/webrtc"
+    else
+        echo "Directory $dir/org/webrtc not found, skipping rename."
     fi
     
     # Update BUILD.gn files
@@ -49,8 +53,8 @@ git clean -fd
 cd ..
 
 # Apply jsoncpp patch first
-echo "Applying jsoncpp patch..."
-patch -N "src/BUILD.gn" < "patches/add_jsoncpp.patch"
+# echo "Applying jsoncpp patch..."
+# patch -N "src/BUILD.gn" < "patches/add_jsoncpp.patch"
 
 # Process Android SDK directory
 echo "Processing Android SDK..."

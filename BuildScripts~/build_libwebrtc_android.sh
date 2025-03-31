@@ -11,11 +11,11 @@ echo "Starting WebRTC Android build process at $(date '+%Y-%m-%d %H:%M:%S')"
 
 
 
-if [ ! -e "$(pwd)/depot_tools" ]
-then
-  echo "Cloning depot_tools..."
-  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
-fi
+# if [ ! -e "$(pwd)/depot_tools" ]
+# then
+#   echo "Cloning depot_tools..."
+#   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+# fi
 
 export COMMAND_DIR=$(cd $(dirname $0); pwd)
 export PATH="$(pwd)/depot_tools:$PATH"
@@ -45,8 +45,8 @@ then
 fi
 
 echo "Executing namespace renaming..."
-chmod +x rename_namespace.sh
-./rename_namespace.sh
+chmod +x BuildScripts~/rename_namespace.sh
+./BuildScripts~/rename_namespace.sh
 
 echo "Adding jsoncpp..."
 patch -N "src/BUILD.gn" < "$COMMAND_DIR/patches/add_jsoncpp.patch"

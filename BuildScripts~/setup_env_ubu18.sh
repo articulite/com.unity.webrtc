@@ -10,7 +10,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting environment setup at $(date '+%Y-%m-%d %H:%M:%S')"
 
-Install pkg-config, zip
+echo "Installing pkg-config, zip, openjdk-8-jdk, patch..."
 sudo apt install -y pkg-config zip
 sudo apt install -y openjdk-8-jdk patch
 
@@ -18,7 +18,10 @@ sudo apt install -y openjdk-8-jdk patch
 echo "Adding Git PPA and installing latest Git..."
 sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt update
-sudo apt install -y git
+# Explicitly install the newer version from PPA to override ESM priority
+sudo apt install -y git=1:2.49.0-0ubuntu1~ubuntu18.04.1 git-man=1:2.49.0-0ubuntu1~ubuntu18.04.1
+sudo apt install -y python-is-python3
+sudo apt install -y snap
 
 # Download Android NDK r21b
 wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
@@ -78,5 +81,21 @@ wget https://github.com/Kitware/CMake/releases/download/v3.24.3/cmake-3.24.3.tar
 tar xvf cmake-3.24.3.tar.gz
 cd cmake-3.24.3
 ./bootstrap && make && sudo make install
+
+
+echo "Installing depot_tools..."
+if [ ! -e "$(pwd)/depot_tools" ]
+then
+  echo "Cloning depot_tools..."
+  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+fi
+
+export PATH="$(pwd)/depot_tools:$PATH"
+
+echo "Fetching webrtc_android..."
+fetch --nohooks webrtc_android
+
+echo "Syncing webrtc_android..."
+gclient sync
 
 echo "Environment setup completed at $(date '+%Y-%m-%d %H:%M:%S')"
