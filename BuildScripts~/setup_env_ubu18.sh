@@ -10,7 +10,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting environment setup at $(date '+%Y-%m-%d %H:%M:%S')"
 
-# Install pkg-config, zip
+Install pkg-config, zip
 sudo apt install -y pkg-config zip
 
 # Download Android NDK r21b
@@ -19,7 +19,7 @@ wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
 # Unzip the downloaded NDK file to home directory
 unzip android-ndk-r21b-linux-x86_64.zip -d ~/
 
-# Set Android NDK root path to `ANDROID_NDK` environment variable
+Set Android NDK root path to `ANDROID_NDK` environment variable
 echo "export ANDROID_NDK=~/android-ndk-r21b/" >> ~/.profile
 
 
@@ -41,9 +41,17 @@ sudo ln -sf g++-9 /usr/bin/g++
 echo "Installing other packages..."
 sudo apt install -y vulkan-utils libvulkan1 libvulkan-dev libglfw3-dev ninja-build
 
+# Install pip for Python 3
+echo "Installing pip..."
+sudo apt install -y python3-pip
+
+# Upgrade pip and setuptools
+echo "Upgrading pip and setuptools..."
+sudo pip3 install --upgrade pip setuptools
+
 # Install glad2
 echo "Installing glad2..."
-sudo pip install git+https://github.com/dav1dde/glad.git@glad2#egg=glad2
+sudo pip3 install glad2
 
 # Install CUDA SDK
 echo "Installing CUDA SDK..."
